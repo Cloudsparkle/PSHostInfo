@@ -34,10 +34,10 @@ if ($currentDir -eq $PSHOME.TrimEnd('\'))
 #Set path to display icon
 $IconOKPath = $currentDir + "\support.ico"
 $IconOKFileExists = Test-Path $IconOKPath
-If ($TempFileExists -eq $fals)
-	{
-		Write-Host -ForegroundColor Red "Display icon not found. Exiting..."
-    exit 1
+If ($IconOKFileExists -eq $fals)
+    {
+	    Write-Host -ForegroundColor Red "Display icon not found. Exiting..."
+        exit 1
 	}
 
 #Initialize
