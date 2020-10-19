@@ -27,17 +27,17 @@
 #Credits 2: https://powershell.org/forums/topic/compile-ps1-to-exe/ - Dave Wyatt
 $currentDir = [System.AppDomain]::CurrentDomain.BaseDirectory.TrimEnd('\')
 if ($currentDir -eq $PSHOME.TrimEnd('\'))
-{
-	$currentDir = $PSScriptRoot
-}
+	{
+		$currentDir = $PSScriptRoot
+	}
 
 #Set path to display icon
 $IconOKPath = $currentDir + "\support.ico"
 $IconOKFileExists = Test-Path $IconOKPath
 If ($IconOKFileExists -eq $fals)
-    {
-	    Write-Host -ForegroundColor Red "Display icon not found. Exiting..."
-        exit 1
+	{
+			Write-Host -ForegroundColor Red "Display icon not found. Exiting..."
+			exit 1
 	}
 
 #Initialize
