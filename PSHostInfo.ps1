@@ -120,12 +120,12 @@ Function Get-IniContent
 #Function to actually check for information
 Function CheckComputer
 {
-    $computername = $Env:computername
+    $script:computername = $Env:computername
     $username = $env:USERNAME
     $domainname = $env:USERDOMAIN
-    $domainuser = $domainname + "\" + $username
+    $script:domainuser = $domainname + "\" + $username
     $Netinfo = Test-Connection $computername -count 1 | select Address,Ipv4Address
-    $ipaddress = $netinfo.IPV4Address.IPAddressToString
+    $script:ipaddress = $netinfo.IPV4Address.IPAddressToString
 
     if ($ShowUser -eq 0)
         {
@@ -166,10 +166,23 @@ $IniFileExists = Test-Path $IniFilePath
 If ($IniFileExists -eq $true)
   {
     $IniFile = Get-IniContent $IniFilePath
+
     $ShowExit = $IniFile["MENU"]["ShowExit"]
     if ($ShowExit -eq $null)
       {
         $ShowExit = 0
+      }
+
+    $ShowSupportMail = $IniFile["MENU"]["ShowSupportMail"]
+    if ($ShowSupportMail -eq $null)
+      {
+        $ShowSupportMail = 0
+      }
+
+    $ShowSupportPortal = $IniFile["MENU"]["ShowSupportPortal"]
+    if ($ShowSupportMail -eq $null)
+      {
+        $ShowSupportMail = 0
       }
 
     $ShowUser = $IniFile["OUTPUT"]["ShowUser"]
@@ -182,6 +195,7 @@ Else
   {
     $ShowExit = 0
     $ShowUser = 0
+    $ShowSupportMail = 0
   }
 
 #Set path to display icon
@@ -221,12 +235,49 @@ if ($ShowExit -eq 1)
     })
   }
 
+#Set up the right-click menu for E-mailing Support
+if ($ShowSupportMail -eq 1)
+  {
+    $MenuItem3 = New-Object System.Windows.Forms.MenuItem
+    $NotifyIcon.contextMenu.MenuItems.AddRange($MenuItem3)
+
+    $MenuItem3.Text = "Support E-Mail"
+    $MenuItem3.add_Click({
+        $Mailto = $IniFile["SUPPORT"]["SupportMail"]
+        if ($mailto -eq "")
+            {
+            $mailto = "WARNING: Support E-mail address not defined in ini!"
+            }
+        $Mailstring = "mailto:"+ $Mailto + "?Body=User: " + $domainuser + "%0D%0A" + "Computer: " + $computername + "%0D%0A" + "IP Address: " + $ipAddress
+        Start-Process $Mailstring
+        
+    })
+  }
+
+#Set up the right-click menu for opening Support Web Portal
+if ($ShowSupportPortal -eq 1)
+  {
+    $MenuItem4 = New-Object System.Windows.Forms.MenuItem
+    $NotifyIcon.contextMenu.MenuItems.AddRange($MenuItem4)
+
+    $MenuItem4.Text = "Support Portal"
+    $MenuItem4.add_Click({
+        $PortalURL = $IniFile["SUPPORT"]["SupportPortal"]
+        if ($PortalURL -eq "")
+            {
+            $PortalURL = "https://www.google.com"
+            }
+        Write-Host $PortalURL
+        Start-Process $PortalURL
+        
+    })
+  }
+
 #Set up the right-click menu for Copy to ClipBoard
 $MenuItem2 = New-Object System.Windows.Forms.MenuItem
 $NotifyIcon.contextMenu.MenuItems.AddRange($MenuItem2)
 $MenuItem2.Text = "Copy To ClipBoard"
 $MenuItem2.add_Click({
-   CheckComputer
    Set-Clipboard -Value $Text
 })
 
