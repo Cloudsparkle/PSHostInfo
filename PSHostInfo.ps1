@@ -246,7 +246,7 @@ if ($ShowSupportMail -eq 1)
         $Mailto = $IniFile["SUPPORT"]["SupportMail"]
         if ($mailto -eq "")
             {
-            $mailto = "WARNING: Support E-mail address not defined in ini!"
+            $mailto = "WARNING: Support E-mail address not defined in config.ini!"
             }
         $Mailstring = "mailto:"+ $Mailto + "?Body=User: " + $domainuser + "%0D%0A" + "Computer: " + $computername + "%0D%0A" + "IP Address: " + $ipAddress
         Start-Process $Mailstring
