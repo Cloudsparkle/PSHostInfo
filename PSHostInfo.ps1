@@ -8,7 +8,7 @@
 .INPUTS
   None
 .OUTPUTS
-  None
+  ClipBoard
 .NOTES
   Version:        	1.0
   Author:         	Bart Jacobs - @Cloudsparkle
@@ -180,9 +180,9 @@ If ($IniFileExists -eq $true)
       }
 
     $ShowSupportPortal = $IniFile["MENU"]["ShowSupportPortal"]
-    if ($ShowSupportMail -eq $null)
+    if ($ShowSupportPortal -eq $null)
       {
-        $ShowSupportMail = 0
+        $ShowSupportPortal = 0
       }
 
     $ShowUser = $IniFile["OUTPUT"]["ShowUser"]
@@ -196,6 +196,7 @@ Else
     $ShowExit = 0
     $ShowUser = 0
     $ShowSupportMail = 0
+    $ShowSupportPortal = 0
   }
 
 #Set path to display icon
@@ -235,6 +236,12 @@ if ($ShowExit -eq 1)
     })
   }
 
+#Set up the right-click menu for Copy to ClipBoard
+$MenuItem2 = New-Object System.Windows.Forms.MenuItem
+$NotifyIcon.contextMenu.MenuItems.AddRange($MenuItem2)
+$MenuItem2.Text = "Copy To ClipBoard"
+$MenuItem2.add_Click({Set-Clipboard -Value $Text})
+
 #Set up the right-click menu for E-mailing Support
 if ($ShowSupportMail -eq 1)
   {
@@ -250,7 +257,7 @@ if ($ShowSupportMail -eq 1)
             }
         $Mailstring = "mailto:"+ $Mailto + "?Body=User: " + $domainuser + "%0D%0A" + "Computer: " + $computername + "%0D%0A" + "IP Address: " + $ipAddress
         Start-Process $Mailstring
-        
+
     })
   }
 
@@ -269,21 +276,11 @@ if ($ShowSupportPortal -eq 1)
             }
         Write-Host $PortalURL
         Start-Process $PortalURL
-        
     })
   }
 
-#Set up the right-click menu for Copy to ClipBoard
-$MenuItem2 = New-Object System.Windows.Forms.MenuItem
-$NotifyIcon.contextMenu.MenuItems.AddRange($MenuItem2)
-$MenuItem2.Text = "Copy To ClipBoard"
-$MenuItem2.add_Click({
-   Set-Clipboard -Value $Text
-})
-
 #Set the refresh timer
 $TimerPC.Interval =  30000  # (30 sec)
-
 $TimerPC.add_Tick({CheckComputer})
 $TimerPC.start()
 
